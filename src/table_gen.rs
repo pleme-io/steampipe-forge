@@ -3,6 +3,8 @@
 //! Generates table definition files and plugin registration code following the
 //! patterns established by the steampipe-plugin-akeyless reference implementation.
 
+use std::fmt;
+
 use iac_forge::ir::{IacAttribute, IacDataSource, IacProvider, IacResource, IacType};
 use iac_forge::naming::{to_pascal_case, to_snake_case};
 
@@ -30,6 +32,45 @@ impl TableNames {
             provider_pascal: to_pascal_case(&provider.name),
             table_name: format!("{}_{snake_name}", provider.name),
             pascal_name: to_pascal_case(entity_name),
+        }
+    }
+}
+
+/// Steampipe column type mapped from the IR type system.
+///
+/// Wraps the Go `proto.ColumnType_*` constant string so we can provide
+/// idiomatic [`From`] and [`Display`] implementations instead of a bare
+/// function returning `&'static str`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ColumnType(&'static str);
+
+impl ColumnType {
+    /// The underlying Go constant string (e.g. `"proto.ColumnType_STRING"`).
+    #[must_use]
+    pub fn as_go_const(self) -> &'static str {
+        self.0
+    }
+}
+
+impl fmt::Display for ColumnType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.0)
+    }
+}
+
+impl From<&IacType> for ColumnType {
+    fn from(iac_type: &IacType) -> Self {
+        match iac_type {
+            IacType::String => Self("proto.ColumnType_STRING"),
+            IacType::Integer => Self("proto.ColumnType_INT"),
+            IacType::Float => Self("proto.ColumnType_DOUBLE"),
+            IacType::Boolean => Self("proto.ColumnType_BOOL"),
+            IacType::List(_)
+            | IacType::Set(_)
+            | IacType::Map(_)
+            | IacType::Object { .. }
+            | IacType::Any => Self("proto.ColumnType_JSON"),
+            IacType::Enum { underlying, .. } => Self::from(underlying.as_ref()),
         }
     }
 }
@@ -85,20 +126,12 @@ fn generate_table(source: &dyn TableSource, provider: &IacProvider) -> String {
 }
 
 /// Map an `IacType` to the Steampipe `proto.ColumnType_*` constant.
+///
+/// Prefer using `ColumnType::from(iac_type)` directly for richer type
+/// information; this function is kept for backward compatibility.
 #[must_use]
 pub fn iac_type_to_column_type(iac_type: &IacType) -> &'static str {
-    match iac_type {
-        IacType::String => "proto.ColumnType_STRING",
-        IacType::Integer => "proto.ColumnType_INT",
-        IacType::Float => "proto.ColumnType_DOUBLE",
-        IacType::Boolean => "proto.ColumnType_BOOL",
-        IacType::List(_)
-        | IacType::Set(_)
-        | IacType::Map(_)
-        | IacType::Object { .. }
-        | IacType::Any => "proto.ColumnType_JSON",
-        IacType::Enum { underlying, .. } => iac_type_to_column_type(underlying),
-    }
+    ColumnType::from(iac_type).as_go_const()
 }
 
 /// Generate the Go table definition file for a single resource.
@@ -253,7 +286,7 @@ fn generate_columns(attributes: &[IacAttribute]) -> String {
     let body: String = attributes
         .iter()
         .map(|attr| {
-            let col_type = iac_type_to_column_type(&attr.iac_type);
+            let col_type = ColumnType::from(&attr.iac_type);
             let desc = if attr.description.is_empty() {
                 format!("The {} field.", attr.canonical_name)
             } else {
