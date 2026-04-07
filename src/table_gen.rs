@@ -34,6 +34,11 @@ impl TableNames {
             pascal_name: to_pascal_case(entity_name),
         }
     }
+
+    /// Fallback description when the entity has none of its own.
+    fn default_description(&self) -> String {
+        format!("{} {} table", self.provider_pascal, self.pascal_name)
+    }
 }
 
 /// Steampipe column type mapped from the IR type system.
@@ -115,10 +120,11 @@ impl TableSource for IacDataSource {
 fn generate_table(source: &dyn TableSource, provider: &IacProvider) -> String {
     let names = TableNames::new(source.name(), provider);
 
-    let description = if source.description().is_empty() {
-        format!("{} {} table", names.provider_pascal, names.pascal_name)
+    let desc_raw = source.description();
+    let description = if desc_raw.is_empty() {
+        names.default_description()
     } else {
-        source.description().to_owned()
+        desc_raw.to_owned()
     };
 
     let columns = generate_columns(source.attributes());
