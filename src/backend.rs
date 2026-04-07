@@ -457,4 +457,32 @@ mod tests {
         let b = a;
         assert_eq!(a.platform(), b.platform());
     }
+
+    #[test]
+    fn table_path_resource() {
+        let provider = test_provider("acme");
+        let path = table_path(&provider, "widget", &ArtifactKind::Resource);
+        assert_eq!(path, "table_acme_widget.go");
+    }
+
+    #[test]
+    fn table_path_data_source() {
+        let provider = test_provider("acme");
+        let path = table_path(&provider, "config", &ArtifactKind::DataSource);
+        assert_eq!(path, "table_acme_config.go");
+    }
+
+    #[test]
+    fn table_path_test() {
+        let provider = test_provider("acme");
+        let path = table_path(&provider, "widget", &ArtifactKind::Test);
+        assert_eq!(path, "table_acme_widget_test.go");
+    }
+
+    #[test]
+    fn table_path_multi_word() {
+        let provider = test_provider("akeyless");
+        let path = table_path(&provider, "static_secret", &ArtifactKind::Resource);
+        assert_eq!(path, "table_akeyless_static_secret.go");
+    }
 }
