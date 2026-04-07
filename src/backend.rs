@@ -5,7 +5,7 @@ use iac_forge::naming::to_snake_case;
 
 use crate::table_gen;
 
-/// Steampipe backend -- generates Go table definitions from IaC forge IR.
+/// Steampipe backend -- generates Go table definitions from `IaC` forge IR.
 pub struct SteampipeBackend;
 
 /// Naming convention for Steampipe plugin tables.
@@ -34,6 +34,8 @@ impl NamingConvention for SteampipeNaming {
 }
 
 impl Backend for SteampipeBackend {
+    // TODO(scope): upstream Backend trait should use `&'static str` for platform()
+    #[allow(clippy::unnecessary_literal_bound)]
     fn platform(&self) -> &str {
         "steampipe"
     }

@@ -33,51 +33,20 @@ pub fn generate_table_file(resource: &IacResource, provider: &IacProvider) -> St
     let provider_pascal = to_pascal_case(&provider.name);
 
     let description = if resource.description.is_empty() {
-        format!("{} {} table", provider_pascal, pascal_name)
+        format!("{provider_pascal} {pascal_name} table")
     } else {
         resource.description.clone()
     };
 
     let columns = generate_columns(&resource.attributes);
 
-    format!(
-        r#"package {provider_name}
-
-import (
-	"context"
-
-	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
-)
-
-func table{provider_pascal}{pascal_name}() *plugin.Table {{
-	return &plugin.Table{{
-		Name:        "{table_name}",
-		Description: "{description}",
-		List: &plugin.ListConfig{{
-			Hydrate: list{provider_pascal}{pascal_name},
-		}},
-		Columns: {provider_pascal_lower}{pascal_name}Columns(),
-	}}
-}}
-
-func {provider_pascal_lower}{pascal_name}Columns() []*plugin.Column {{
-	return []*plugin.Column{{
-{columns}	}}
-}}
-
-func list{provider_pascal}{pascal_name}(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{{}}, error) {{
-	// TODO: Implement list hydrate function.
-	return nil, nil
-}}
-"#,
-        provider_name = provider.name,
-        provider_pascal = provider_pascal,
-        provider_pascal_lower = lowercase_first(&provider_pascal),
-        pascal_name = pascal_name,
-        table_name = table_name,
-        description = escape_go_string(&description),
-        columns = columns,
+    format_table_go(
+        &provider.name,
+        &provider_pascal,
+        &pascal_name,
+        &table_name,
+        &description,
+        &columns,
     )
 }
 
@@ -93,12 +62,37 @@ pub fn generate_data_source_table_file(ds: &IacDataSource, provider: &IacProvide
     let provider_pascal = to_pascal_case(&provider.name);
 
     let description = if ds.description.is_empty() {
-        format!("{} {} table", provider_pascal, pascal_name)
+        format!("{provider_pascal} {pascal_name} table")
     } else {
         ds.description.clone()
     };
 
     let columns = generate_columns(&ds.attributes);
+
+    format_table_go(
+        &provider.name,
+        &provider_pascal,
+        &pascal_name,
+        &table_name,
+        &description,
+        &columns,
+    )
+}
+
+/// Format the Go table definition source for a single table.
+///
+/// Shared by both resource and data-source table generation to avoid
+/// duplicating the Go template.
+fn format_table_go(
+    provider_name: &str,
+    provider_pascal: &str,
+    pascal_name: &str,
+    table_name: &str,
+    description: &str,
+    columns: &str,
+) -> String {
+    let provider_pascal_lower = lowercase_first(provider_pascal);
+    let escaped_description = escape_go_string(description);
 
     format!(
         r#"package {provider_name}
@@ -113,7 +107,7 @@ import (
 func table{provider_pascal}{pascal_name}() *plugin.Table {{
 	return &plugin.Table{{
 		Name:        "{table_name}",
-		Description: "{description}",
+		Description: "{escaped_description}",
 		List: &plugin.ListConfig{{
 			Hydrate: list{provider_pascal}{pascal_name},
 		}},
@@ -130,14 +124,7 @@ func list{provider_pascal}{pascal_name}(ctx context.Context, d *plugin.QueryData
 	// TODO: Implement list hydrate function.
 	return nil, nil
 }}
-"#,
-        provider_name = provider.name,
-        provider_pascal = provider_pascal,
-        provider_pascal_lower = lowercase_first(&provider_pascal),
-        pascal_name = pascal_name,
-        table_name = table_name,
-        description = escape_go_string(&description),
-        columns = columns,
+"#
     )
 }
 
