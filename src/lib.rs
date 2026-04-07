@@ -17,3 +17,4 @@ pub mod backend;
 pub(crate) mod table_gen;
 
 pub use backend::SteampipeBackend;
+pub use table_gen::{ColumnType, iac_type_to_column_type};
