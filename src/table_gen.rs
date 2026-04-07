@@ -34,6 +34,56 @@ impl TableNames {
     }
 }
 
+/// Common interface for IR entities that map to a Steampipe table.
+///
+/// Both [`IacResource`] and [`IacDataSource`] carry a name, description,
+/// and attribute list -- everything needed to emit a Go table file. This
+/// trait captures that overlap so a single `generate_table` function can
+/// serve both callers.
+pub(crate) trait TableSource {
+    fn name(&self) -> &str;
+    fn description(&self) -> &str;
+    fn attributes(&self) -> &[IacAttribute];
+}
+
+impl TableSource for IacResource {
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn description(&self) -> &str {
+        &self.description
+    }
+    fn attributes(&self) -> &[IacAttribute] {
+        &self.attributes
+    }
+}
+
+impl TableSource for IacDataSource {
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn description(&self) -> &str {
+        &self.description
+    }
+    fn attributes(&self) -> &[IacAttribute] {
+        &self.attributes
+    }
+}
+
+/// Generate the Go table definition file for any [`TableSource`].
+fn generate_table(source: &dyn TableSource, provider: &IacProvider) -> String {
+    let names = TableNames::new(source.name(), provider);
+
+    let description = if source.description().is_empty() {
+        format!("{} {} table", names.provider_pascal, names.pascal_name)
+    } else {
+        source.description().to_owned()
+    };
+
+    let columns = generate_columns(source.attributes());
+    format_table_go(&names, &description, &columns)
+}
+
 /// Map an `IacType` to the Steampipe `proto.ColumnType_*` constant.
 #[must_use]
 pub fn iac_type_to_column_type(iac_type: &IacType) -> &'static str {
@@ -57,17 +107,7 @@ pub fn iac_type_to_column_type(iac_type: &IacType) -> &'static str {
 /// function, columns function, and a list hydrate stub.
 #[must_use]
 pub fn generate_table_file(resource: &IacResource, provider: &IacProvider) -> String {
-    let names = TableNames::new(&resource.name, provider);
-
-    let description = if resource.description.is_empty() {
-        format!("{} {} table", names.provider_pascal, names.pascal_name)
-    } else {
-        resource.description.clone()
-    };
-
-    let columns = generate_columns(&resource.attributes);
-
-    format_table_go(&names, &description, &columns)
+    generate_table(resource, provider)
 }
 
 /// Generate the Go table definition file for a data source (read-only query).
@@ -76,17 +116,7 @@ pub fn generate_table_file(resource: &IacResource, provider: &IacProvider) -> St
 /// to the same table pattern as resources.
 #[must_use]
 pub fn generate_data_source_table_file(ds: &IacDataSource, provider: &IacProvider) -> String {
-    let names = TableNames::new(&ds.name, provider);
-
-    let description = if ds.description.is_empty() {
-        format!("{} {} table", names.provider_pascal, names.pascal_name)
-    } else {
-        ds.description.clone()
-    };
-
-    let columns = generate_columns(&ds.attributes);
-
-    format_table_go(&names, &description, &columns)
+    generate_table(ds, provider)
 }
 
 /// Format the Go table definition source for a single table.
