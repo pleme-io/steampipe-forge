@@ -1,3 +1,5 @@
+use std::fmt;
+
 use iac_forge::backend::{ArtifactKind, Backend, GeneratedArtifact, NamingConvention};
 use iac_forge::error::IacForgeError;
 use iac_forge::ir::{IacDataSource, IacProvider, IacResource};
@@ -8,6 +10,12 @@ use crate::table_gen;
 /// Steampipe backend -- generates Go table definitions from `IaC` forge IR.
 #[derive(Debug, Default, Copy, Clone)]
 pub struct SteampipeBackend;
+
+impl fmt::Display for SteampipeBackend {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("steampipe")
+    }
+}
 
 /// Naming convention for Steampipe plugin tables.
 #[derive(Debug, Default, Copy, Clone)]
