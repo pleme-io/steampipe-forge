@@ -6,9 +6,11 @@ use iac_forge::naming::to_snake_case;
 use crate::table_gen;
 
 /// Steampipe backend -- generates Go table definitions from `IaC` forge IR.
+#[derive(Debug, Default, Copy, Clone)]
 pub struct SteampipeBackend;
 
 /// Naming convention for Steampipe plugin tables.
+#[derive(Debug, Default, Copy, Clone)]
 struct SteampipeNaming;
 
 impl NamingConvention for SteampipeNaming {
