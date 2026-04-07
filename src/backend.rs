@@ -440,4 +440,23 @@ mod tests {
         assert_eq!(artifacts[0].path, "plugin.go");
         assert_eq!(artifacts[0].kind, ArtifactKind::Provider);
     }
+
+    #[test]
+    fn display_matches_platform() {
+        let backend = SteampipeBackend;
+        assert_eq!(backend.to_string(), backend.platform());
+    }
+
+    #[test]
+    fn default_creates_valid_backend() {
+        let backend = SteampipeBackend::default();
+        assert_eq!(backend.platform(), "steampipe");
+    }
+
+    #[test]
+    fn backend_is_copy() {
+        let a = SteampipeBackend;
+        let b = a;
+        assert_eq!(a.platform(), b.platform());
+    }
 }

@@ -421,6 +421,54 @@ mod tests {
     }
 
     #[test]
+    fn column_type_newtype_from_iac_type() {
+        let ct = ColumnType::from(&IacType::String);
+        assert_eq!(ct.as_go_const(), "proto.ColumnType_STRING");
+
+        let ct = ColumnType::from(&IacType::Integer);
+        assert_eq!(ct.as_go_const(), "proto.ColumnType_INT");
+    }
+
+    #[test]
+    fn column_type_display() {
+        let ct = ColumnType::from(&IacType::Boolean);
+        assert_eq!(ct.to_string(), "proto.ColumnType_BOOL");
+    }
+
+    #[test]
+    fn column_type_equality() {
+        let a = ColumnType::from(&IacType::Float);
+        let b = ColumnType::from(&IacType::Float);
+        assert_eq!(a, b);
+
+        let c = ColumnType::from(&IacType::String);
+        assert_ne!(a, c);
+    }
+
+    #[test]
+    fn table_names_default_description() {
+        let provider = test_provider("acme");
+        let names = TableNames::new("static_secret", &provider);
+        assert_eq!(names.default_description(), "Acme StaticSecret table");
+    }
+
+    #[test]
+    fn table_source_resource_impl() {
+        let resource = test_resource("secret");
+        let source: &dyn TableSource = &resource;
+        assert_eq!(source.name(), "secret");
+        assert!(!source.attributes().is_empty());
+    }
+
+    #[test]
+    fn table_source_data_source_impl() {
+        let ds = test_data_source("config");
+        let source: &dyn TableSource = &ds;
+        assert_eq!(source.name(), "config");
+        assert!(!source.attributes().is_empty());
+    }
+
+    #[test]
     fn generate_table_file_basic() {
         let provider = test_provider("akeyless");
         let resource = test_resource("secret");
