@@ -6,6 +6,34 @@
 use iac_forge::ir::{IacAttribute, IacDataSource, IacProvider, IacResource, IacType};
 use iac_forge::naming::{to_pascal_case, to_snake_case};
 
+/// Pre-computed naming components used throughout table code generation.
+///
+/// Centralises the `snake_case` / `PascalCase` derivations so every
+/// generator works from one consistent set of names.
+#[derive(Debug, Clone)]
+struct TableNames {
+    /// e.g. `"akeyless"`
+    provider_name: String,
+    /// e.g. `"Akeyless"`
+    provider_pascal: String,
+    /// e.g. `"akeyless_static_secret"`
+    table_name: String,
+    /// e.g. `"StaticSecret"`
+    pascal_name: String,
+}
+
+impl TableNames {
+    fn new(entity_name: &str, provider: &IacProvider) -> Self {
+        let snake_name = to_snake_case(entity_name);
+        Self {
+            provider_name: provider.name.clone(),
+            provider_pascal: to_pascal_case(&provider.name),
+            table_name: format!("{}_{snake_name}", provider.name),
+            pascal_name: to_pascal_case(entity_name),
+        }
+    }
+}
+
 /// Map an `IacType` to the Steampipe `proto.ColumnType_*` constant.
 #[must_use]
 pub fn iac_type_to_column_type(iac_type: &IacType) -> &'static str {
@@ -14,9 +42,11 @@ pub fn iac_type_to_column_type(iac_type: &IacType) -> &'static str {
         IacType::Integer => "proto.ColumnType_INT",
         IacType::Float => "proto.ColumnType_DOUBLE",
         IacType::Boolean => "proto.ColumnType_BOOL",
-        IacType::List(_) | IacType::Set(_) | IacType::Map(_) | IacType::Object { .. } | IacType::Any => {
-            "proto.ColumnType_JSON"
-        }
+        IacType::List(_)
+        | IacType::Set(_)
+        | IacType::Map(_)
+        | IacType::Object { .. }
+        | IacType::Any => "proto.ColumnType_JSON",
         IacType::Enum { underlying, .. } => iac_type_to_column_type(underlying),
     }
 }
@@ -27,27 +57,17 @@ pub fn iac_type_to_column_type(iac_type: &IacType) -> &'static str {
 /// function, columns function, and a list hydrate stub.
 #[must_use]
 pub fn generate_table_file(resource: &IacResource, provider: &IacProvider) -> String {
-    let snake_name = to_snake_case(&resource.name);
-    let table_name = format!("{}_{}", provider.name, snake_name);
-    let pascal_name = to_pascal_case(&resource.name);
-    let provider_pascal = to_pascal_case(&provider.name);
+    let names = TableNames::new(&resource.name, provider);
 
     let description = if resource.description.is_empty() {
-        format!("{provider_pascal} {pascal_name} table")
+        format!("{} {} table", names.provider_pascal, names.pascal_name)
     } else {
         resource.description.clone()
     };
 
     let columns = generate_columns(&resource.attributes);
 
-    format_table_go(
-        &provider.name,
-        &provider_pascal,
-        &pascal_name,
-        &table_name,
-        &description,
-        &columns,
-    )
+    format_table_go(&names, &description, &columns)
 }
 
 /// Generate the Go table definition file for a data source (read-only query).
@@ -56,41 +76,28 @@ pub fn generate_table_file(resource: &IacResource, provider: &IacProvider) -> St
 /// to the same table pattern as resources.
 #[must_use]
 pub fn generate_data_source_table_file(ds: &IacDataSource, provider: &IacProvider) -> String {
-    let snake_name = to_snake_case(&ds.name);
-    let table_name = format!("{}_{}", provider.name, snake_name);
-    let pascal_name = to_pascal_case(&ds.name);
-    let provider_pascal = to_pascal_case(&provider.name);
+    let names = TableNames::new(&ds.name, provider);
 
     let description = if ds.description.is_empty() {
-        format!("{provider_pascal} {pascal_name} table")
+        format!("{} {} table", names.provider_pascal, names.pascal_name)
     } else {
         ds.description.clone()
     };
 
     let columns = generate_columns(&ds.attributes);
 
-    format_table_go(
-        &provider.name,
-        &provider_pascal,
-        &pascal_name,
-        &table_name,
-        &description,
-        &columns,
-    )
+    format_table_go(&names, &description, &columns)
 }
 
 /// Format the Go table definition source for a single table.
 ///
 /// Shared by both resource and data-source table generation to avoid
 /// duplicating the Go template.
-fn format_table_go(
-    provider_name: &str,
-    provider_pascal: &str,
-    pascal_name: &str,
-    table_name: &str,
-    description: &str,
-    columns: &str,
-) -> String {
+fn format_table_go(names: &TableNames, description: &str, columns: &str) -> String {
+    let provider_name = &names.provider_name;
+    let provider_pascal = &names.provider_pascal;
+    let pascal_name = &names.pascal_name;
+    let table_name = &names.table_name;
     let provider_pascal_lower = lowercase_first(provider_pascal);
     let escaped_description = escape_go_string(description);
 
@@ -135,18 +142,15 @@ pub fn generate_plugin_file(
     resources: &[IacResource],
     data_sources: &[IacDataSource],
 ) -> String {
-    let provider_pascal = to_pascal_case(&provider.name);
     let plugin_name = format!("steampipe-plugin-{}", provider.name);
 
-    let resource_names = resources.iter().map(|r| &r.name);
-    let ds_names = data_sources.iter().map(|d| &d.name);
-
-    let table_entries: Vec<String> = resource_names
-        .chain(ds_names)
-        .map(|name| format_table_map_entry(&provider.name, &provider_pascal, name))
-        .collect();
-
-    let table_map = table_entries.join("\n");
+    let table_map: String = resources
+        .iter()
+        .map(|r| &r.name)
+        .chain(data_sources.iter().map(|d| &d.name))
+        .map(|name| format_table_map_entry(&TableNames::new(name, provider)))
+        .collect::<Vec<_>>()
+        .join("\n");
 
     format!(
         r#"package {provider_name}
@@ -171,20 +175,17 @@ func Plugin(ctx context.Context) *plugin.Plugin {{
 }
 
 /// Format a single `TableMap` entry line for `plugin.go`.
-fn format_table_map_entry(provider_name: &str, provider_pascal: &str, name: &str) -> String {
-    let snake_name = to_snake_case(name);
-    let table_name = format!("{provider_name}_{snake_name}");
-    let pascal_name = to_pascal_case(name);
-    format!("\t\t\t\"{table_name}\": table{provider_pascal}{pascal_name}(),")
+fn format_table_map_entry(names: &TableNames) -> String {
+    format!(
+        "\t\t\t\"{}\": table{}{}(),",
+        names.table_name, names.provider_pascal, names.pascal_name
+    )
 }
 
 /// Generate a basic test stub for a resource table.
 #[must_use]
 pub fn generate_test_file(resource: &IacResource, provider: &IacProvider) -> String {
-    let snake_name = to_snake_case(&resource.name);
-    let table_name = format!("{}_{}", provider.name, snake_name);
-    let pascal_name = to_pascal_case(&resource.name);
-    let provider_pascal = to_pascal_case(&provider.name);
+    let names = TableNames::new(&resource.name, provider);
 
     format!(
         r#"package {provider_name}
@@ -206,10 +207,10 @@ func TestTable{provider_pascal}{pascal_name}(t *testing.T) {{
 	}}
 }}
 "#,
-        provider_name = provider.name,
-        provider_pascal = provider_pascal,
-        pascal_name = pascal_name,
-        table_name = table_name,
+        provider_name = names.provider_name,
+        provider_pascal = names.provider_pascal,
+        pascal_name = names.pascal_name,
+        table_name = names.table_name,
     )
 }
 
