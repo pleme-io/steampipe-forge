@@ -138,25 +138,13 @@ pub fn generate_plugin_file(
     let provider_pascal = to_pascal_case(&provider.name);
     let plugin_name = format!("steampipe-plugin-{}", provider.name);
 
-    let mut table_entries = Vec::new();
+    let resource_names = resources.iter().map(|r| &r.name);
+    let ds_names = data_sources.iter().map(|d| &d.name);
 
-    for resource in resources {
-        let snake_name = to_snake_case(&resource.name);
-        let table_name = format!("{}_{}", provider.name, snake_name);
-        let pascal_name = to_pascal_case(&resource.name);
-        table_entries.push(format!(
-            "\t\t\t\"{table_name}\": table{provider_pascal}{pascal_name}(),"
-        ));
-    }
-
-    for ds in data_sources {
-        let snake_name = to_snake_case(&ds.name);
-        let table_name = format!("{}_{}", provider.name, snake_name);
-        let pascal_name = to_pascal_case(&ds.name);
-        table_entries.push(format!(
-            "\t\t\t\"{table_name}\": table{provider_pascal}{pascal_name}(),"
-        ));
-    }
+    let table_entries: Vec<String> = resource_names
+        .chain(ds_names)
+        .map(|name| format_table_map_entry(&provider.name, &provider_pascal, name))
+        .collect();
 
     let table_map = table_entries.join("\n");
 
@@ -179,9 +167,15 @@ func Plugin(ctx context.Context) *plugin.Plugin {{
 }}
 "#,
         provider_name = provider.name,
-        plugin_name = plugin_name,
-        table_map = table_map,
     )
+}
+
+/// Format a single `TableMap` entry line for `plugin.go`.
+fn format_table_map_entry(provider_name: &str, provider_pascal: &str, name: &str) -> String {
+    let snake_name = to_snake_case(name);
+    let table_name = format!("{provider_name}_{snake_name}");
+    let pascal_name = to_pascal_case(name);
+    format!("\t\t\t\"{table_name}\": table{provider_pascal}{pascal_name}(),")
 }
 
 /// Generate a basic test stub for a resource table.
