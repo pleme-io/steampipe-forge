@@ -446,6 +446,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::default_constructed_unit_structs)]
     fn default_creates_valid_backend() {
         let backend = SteampipeBackend::default();
         assert_eq!(backend.platform(), "steampipe");
