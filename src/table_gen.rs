@@ -311,6 +311,7 @@ fn generate_columns(attributes: &[IacAttribute]) -> String {
 }
 
 /// Escape a string for use in a Go string literal (double-quoted).
+#[must_use]
 fn escape_go_string(s: &str) -> String {
     s.replace('\\', "\\\\")
         .replace('"', "\\\"")
@@ -319,6 +320,7 @@ fn escape_go_string(s: &str) -> String {
 }
 
 /// Lowercase the first character of a string.
+#[must_use]
 fn lowercase_first(s: &str) -> String {
     let mut chars = s.chars();
     match chars.next() {
