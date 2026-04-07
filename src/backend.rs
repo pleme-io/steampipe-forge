@@ -346,10 +346,88 @@ mod tests {
     #[test]
     fn naming_data_source_type_name_delegates() {
         let naming = SteampipeNaming;
-        // data_source_type_name defaults to resource_type_name
         assert_eq!(
             naming.data_source_type_name("config", "acme"),
             naming.resource_type_name("config", "acme")
         );
+    }
+
+    #[test]
+    fn naming_file_name_data_source() {
+        let naming = SteampipeNaming;
+        assert_eq!(
+            naming.file_name("user_config", &ArtifactKind::DataSource),
+            "table_user_config.go"
+        );
+    }
+
+    #[test]
+    fn naming_resource_type_name_multi_word() {
+        let naming = SteampipeNaming;
+        assert_eq!(
+            naming.resource_type_name("auth_method", "akeyless"),
+            "akeyless_auth_method"
+        );
+    }
+
+    #[test]
+    fn naming_field_name_underscores() {
+        let naming = SteampipeNaming;
+        assert_eq!(naming.field_name("already_snake"), "already_snake");
+    }
+
+    #[test]
+    fn validate_resource_warning_message_content() {
+        let backend = SteampipeBackend;
+        let provider = test_provider("acme");
+        let mut resource = test_resource("empty");
+        resource.attributes = vec![];
+
+        let warnings = backend.validate_resource(&resource, &provider);
+        assert_eq!(warnings.len(), 1);
+        assert!(warnings[0].contains("empty"));
+        assert!(warnings[0].contains("no attributes"));
+        assert!(warnings[0].contains("no columns"));
+    }
+
+    #[test]
+    fn generate_resource_path_uses_provider_prefix() {
+        let backend = SteampipeBackend;
+        let provider = test_provider("mycloud");
+        let resource = test_resource("vm");
+
+        let artifacts = backend.generate_resource(&resource, &provider).unwrap();
+        assert_eq!(artifacts[0].path, "table_mycloud_vm.go");
+    }
+
+    #[test]
+    fn generate_data_source_path_uses_provider_prefix() {
+        let backend = SteampipeBackend;
+        let provider = test_provider("mycloud");
+        let ds = test_data_source("network");
+
+        let artifacts = backend.generate_data_source(&ds, &provider).unwrap();
+        assert_eq!(artifacts[0].path, "table_mycloud_network.go");
+    }
+
+    #[test]
+    fn generate_test_path_uses_provider_prefix() {
+        let backend = SteampipeBackend;
+        let provider = test_provider("mycloud");
+        let resource = test_resource("vm");
+
+        let artifacts = backend.generate_test(&resource, &provider).unwrap();
+        assert_eq!(artifacts[0].path, "table_mycloud_vm_test.go");
+    }
+
+    #[test]
+    fn generate_provider_always_produces_plugin_go() {
+        let backend = SteampipeBackend;
+        let provider = test_provider("mycloud");
+
+        let artifacts = backend.generate_provider(&provider, &[], &[]).unwrap();
+        assert_eq!(artifacts.len(), 1);
+        assert_eq!(artifacts[0].path, "plugin.go");
+        assert_eq!(artifacts[0].kind, ArtifactKind::Provider);
     }
 }

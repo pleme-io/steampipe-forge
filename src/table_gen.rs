@@ -510,10 +510,43 @@ mod tests {
     }
 
     #[test]
+    fn escape_go_string_tabs() {
+        assert_eq!(escape_go_string("col1\tcol2"), "col1\\tcol2");
+    }
+
+    #[test]
+    fn escape_go_string_combined() {
+        assert_eq!(
+            escape_go_string("line1\nhas \"quotes\" and\ttabs\\end"),
+            r#"line1\nhas \"quotes\" and\ttabs\\end"#
+        );
+    }
+
+    #[test]
+    fn escape_go_string_empty() {
+        assert_eq!(escape_go_string(""), "");
+    }
+
+    #[test]
+    fn escape_go_string_no_special_chars() {
+        assert_eq!(escape_go_string("plain text"), "plain text");
+    }
+
+    #[test]
     fn lowercase_first_basic() {
         assert_eq!(lowercase_first("Akeyless"), "akeyless");
         assert_eq!(lowercase_first("ABC"), "aBC");
         assert_eq!(lowercase_first(""), "");
+    }
+
+    #[test]
+    fn lowercase_first_already_lower() {
+        assert_eq!(lowercase_first("already"), "already");
+    }
+
+    #[test]
+    fn lowercase_first_single_char() {
+        assert_eq!(lowercase_first("X"), "x");
     }
 
     #[test]
@@ -579,6 +612,96 @@ mod tests {
 
         assert!(code.contains("func tableAcmeEmpty()"));
         assert!(code.contains("return []*plugin.Column{"));
+    }
+
+    #[test]
+    fn generate_table_file_custom_description() {
+        let provider = test_provider("acme");
+        let mut resource = test_resource_with_type("widget", "name", IacType::String);
+        resource.description = "Custom widget description with \"quotes\"".to_string();
+
+        let code = generate_table_file(&resource, &provider);
+
+        assert!(code.contains(r#"Description: "Custom widget description with \"quotes\"""#));
+    }
+
+    #[test]
+    fn generate_data_source_custom_description() {
+        let provider = test_provider("acme");
+        let mut ds = test_data_source("config");
+        ds.description = "Custom config data source".to_string();
+
+        let code = generate_data_source_table_file(&ds, &provider);
+
+        assert!(code.contains(r#"Description: "Custom config data source""#));
+    }
+
+    #[test]
+    fn generate_columns_with_custom_attr_description() {
+        let provider = test_provider("acme");
+        let mut resource = test_resource("widget");
+        resource.attributes = vec![
+            TestAttributeBuilder::new("id", IacType::String)
+                .description("Unique identifier for the widget")
+                .build(),
+        ];
+
+        let code = generate_table_file(&resource, &provider);
+
+        assert!(code.contains(r#"Description: "Unique identifier for the widget""#));
+    }
+
+    #[test]
+    fn generate_columns_default_attr_description() {
+        let provider = test_provider("acme");
+        let mut resource = test_resource("widget");
+        resource.attributes = vec![
+            TestAttributeBuilder::new("count", IacType::Integer).build(),
+        ];
+
+        let code = generate_table_file(&resource, &provider);
+
+        assert!(code.contains(r#"Description: "The count field.""#));
+    }
+
+    #[test]
+    fn generate_test_file_multi_word_resource() {
+        let provider = test_provider("akeyless");
+        let resource = test_resource_with_type("static_secret", "name", IacType::String);
+
+        let code = generate_test_file(&resource, &provider);
+
+        assert!(code.contains("func TestTableAkeylessStaticSecret(t *testing.T)"));
+        assert!(code.contains("tableAkeylessStaticSecret()"));
+        assert!(code.contains("\"akeyless_static_secret\""));
+    }
+
+    #[test]
+    fn generate_data_source_table_matches_resource_structure() {
+        let provider = test_provider("acme");
+        let ds = test_data_source("config");
+        let code = generate_data_source_table_file(&ds, &provider);
+
+        assert!(code.contains("import ("));
+        assert!(code.contains("\"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto\""));
+        assert!(code.contains("\"github.com/turbot/steampipe-plugin-sdk/v5/plugin\""));
+        assert!(code.contains("*plugin.Table"));
+        assert!(code.contains("*plugin.Column"));
+    }
+
+    #[test]
+    fn generate_plugin_file_only_data_sources() {
+        let provider = test_provider("acme");
+        let data_sources = vec![
+            test_data_source("users"),
+            test_data_source("groups"),
+        ];
+
+        let code = generate_plugin_file(&provider, &[], &data_sources);
+
+        assert!(code.contains("\"acme_users\": tableAcmeUsers()"));
+        assert!(code.contains("\"acme_groups\": tableAcmeGroups()"));
+        assert!(!code.contains("tableAcme()"));
     }
 
     #[test]
