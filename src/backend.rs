@@ -43,6 +43,18 @@ impl NamingConvention for SteampipeNaming {
     }
 }
 
+/// Build the artifact path for a table-style file.
+///
+/// Encodes the shared `table_{provider}_{resource}[_test].go` pattern
+/// used by `generate_resource`, `generate_data_source`, and `generate_test`.
+fn table_path(provider: &IacProvider, entity_name: &str, kind: &ArtifactKind) -> String {
+    let snake = to_snake_case(entity_name);
+    match kind {
+        ArtifactKind::Test => format!("table_{}_{snake}_test.go", provider.name),
+        _ => format!("table_{}_{snake}.go", provider.name),
+    }
+}
+
 impl Backend for SteampipeBackend {
     // TODO(scope): upstream Backend trait should use `&'static str` for platform()
     #[allow(clippy::unnecessary_literal_bound)]
@@ -55,13 +67,9 @@ impl Backend for SteampipeBackend {
         resource: &IacResource,
         provider: &IacProvider,
     ) -> Result<Vec<GeneratedArtifact>, IacForgeError> {
-        let content = table_gen::generate_table_file(resource, provider);
-        let snake_name = to_snake_case(&resource.name);
-        let path = format!("table_{}_{}.go", provider.name, snake_name);
-
         Ok(vec![GeneratedArtifact {
-            path,
-            content,
+            path: table_path(provider, &resource.name, &ArtifactKind::Resource),
+            content: table_gen::generate_table_file(resource, provider),
             kind: ArtifactKind::Resource,
         }])
     }
@@ -71,13 +79,9 @@ impl Backend for SteampipeBackend {
         ds: &IacDataSource,
         provider: &IacProvider,
     ) -> Result<Vec<GeneratedArtifact>, IacForgeError> {
-        let content = table_gen::generate_data_source_table_file(ds, provider);
-        let snake_name = to_snake_case(&ds.name);
-        let path = format!("table_{}_{}.go", provider.name, snake_name);
-
         Ok(vec![GeneratedArtifact {
-            path,
-            content,
+            path: table_path(provider, &ds.name, &ArtifactKind::DataSource),
+            content: table_gen::generate_data_source_table_file(ds, provider),
             kind: ArtifactKind::DataSource,
         }])
     }
@@ -88,11 +92,9 @@ impl Backend for SteampipeBackend {
         resources: &[IacResource],
         data_sources: &[IacDataSource],
     ) -> Result<Vec<GeneratedArtifact>, IacForgeError> {
-        let content = table_gen::generate_plugin_file(provider, resources, data_sources);
-
         Ok(vec![GeneratedArtifact {
             path: "plugin.go".to_string(),
-            content,
+            content: table_gen::generate_plugin_file(provider, resources, data_sources),
             kind: ArtifactKind::Provider,
         }])
     }
@@ -102,13 +104,9 @@ impl Backend for SteampipeBackend {
         resource: &IacResource,
         provider: &IacProvider,
     ) -> Result<Vec<GeneratedArtifact>, IacForgeError> {
-        let content = table_gen::generate_test_file(resource, provider);
-        let snake_name = to_snake_case(&resource.name);
-        let path = format!("table_{}_{}_test.go", provider.name, snake_name);
-
         Ok(vec![GeneratedArtifact {
-            path,
-            content,
+            path: table_path(provider, &resource.name, &ArtifactKind::Test),
+            content: table_gen::generate_test_file(resource, provider),
             kind: ArtifactKind::Test,
         }])
     }
@@ -122,14 +120,14 @@ impl Backend for SteampipeBackend {
         resource: &IacResource,
         _provider: &IacProvider,
     ) -> Vec<String> {
-        let mut warnings = Vec::new();
         if resource.attributes.is_empty() {
-            warnings.push(format!(
+            vec![format!(
                 "resource '{}' has no attributes -- table will have no columns",
                 resource.name
-            ));
+            )]
+        } else {
+            Vec::new()
         }
-        warnings
     }
 }
 
