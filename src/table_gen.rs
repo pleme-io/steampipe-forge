@@ -246,29 +246,29 @@ func TestTable{provider_pascal}{pascal_name}(t *testing.T) {{
 
 /// Generate the column definitions for a list of attributes.
 fn generate_columns(attributes: &[IacAttribute]) -> String {
-    let mut lines = Vec::new();
-
-    for attr in attributes {
-        let col_type = iac_type_to_column_type(&attr.iac_type);
-        let description = if attr.description.is_empty() {
-            format!("The {} field.", attr.canonical_name)
-        } else {
-            attr.description.clone()
-        };
-
-        lines.push(format!(
-            "\t\t{{\n\t\t\tName:        \"{name}\",\n\t\t\tType:        {col_type},\n\t\t\tDescription: \"{description}\",\n\t\t}},",
-            name = attr.canonical_name,
-            col_type = col_type,
-            description = escape_go_string(&description),
-        ));
+    if attributes.is_empty() {
+        return String::new();
     }
 
-    if lines.is_empty() {
-        String::new()
-    } else {
-        format!("{}\n", lines.join("\n"))
-    }
+    let body: String = attributes
+        .iter()
+        .map(|attr| {
+            let col_type = iac_type_to_column_type(&attr.iac_type);
+            let desc = if attr.description.is_empty() {
+                format!("The {} field.", attr.canonical_name)
+            } else {
+                attr.description.clone()
+            };
+            format!(
+                "\t\t{{\n\t\t\tName:        \"{name}\",\n\t\t\tType:        {col_type},\n\t\t\tDescription: \"{desc}\",\n\t\t}},",
+                name = attr.canonical_name,
+                desc = escape_go_string(&desc),
+            )
+        })
+        .collect::<Vec<_>>()
+        .join("\n");
+
+    format!("{body}\n")
 }
 
 /// Escape a string for use in a Go string literal (double-quoted).
