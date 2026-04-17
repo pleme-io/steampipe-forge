@@ -68,7 +68,7 @@ impl From<&IacType> for ColumnType {
         match iac_type {
             IacType::String => Self("proto.ColumnType_STRING"),
             IacType::Integer => Self("proto.ColumnType_INT"),
-            IacType::Float => Self("proto.ColumnType_DOUBLE"),
+            IacType::Float | IacType::Numeric => Self("proto.ColumnType_DOUBLE"),
             IacType::Boolean => Self("proto.ColumnType_BOOL"),
             IacType::List(_)
             | IacType::Set(_)
@@ -76,6 +76,7 @@ impl From<&IacType> for ColumnType {
             | IacType::Object { .. }
             | IacType::Any => Self("proto.ColumnType_JSON"),
             IacType::Enum { underlying, .. } => Self::from(underlying.as_ref()),
+            other => panic!("unsupported IacType variant in steampipe-forge: {other:?} — add an explicit mapping"),
         }
     }
 }
