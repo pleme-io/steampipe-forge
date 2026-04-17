@@ -30,6 +30,7 @@ table_<provider>_<name>_test.go -- per-resource test stub
 IacType::String       -> proto.ColumnType_STRING
 IacType::Integer      -> proto.ColumnType_INT
 IacType::Float        -> proto.ColumnType_DOUBLE
+IacType::Numeric      -> proto.ColumnType_DOUBLE  (Terraform `number` — int or float)
 IacType::Boolean      -> proto.ColumnType_BOOL
 IacType::List(T)      -> proto.ColumnType_JSON
 IacType::Set(T)       -> proto.ColumnType_JSON
@@ -38,6 +39,10 @@ IacType::Object       -> proto.ColumnType_JSON
 IacType::Enum         -> proto.ColumnType_STRING (underlying type governs)
 IacType::Any          -> proto.ColumnType_JSON
 ```
+
+`IacType` is `#[non_exhaustive]`. The match has an explicit `_ => panic!`
+arm so any future iac-forge variant surfaces as a compile-time failure
+rather than a silent fallback.
 
 ## Key Types
 
