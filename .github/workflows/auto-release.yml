@@ -1,0 +1,23 @@
+name: auto-release
+
+# Three-line consumer shim. Every push to main runs the pleme-io
+# substrate single-crate auto-release pipeline (bump → commit →
+# tag → push → publish-to-crates.io). The reusable workflow lives
+# at pleme-io/substrate/.github/workflows/cargo-auto-release.yml.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      bump-type:
+        description: "patch | minor | major"
+        required: false
+        default: patch
+
+jobs:
+  release:
+    uses: pleme-io/substrate/.github/workflows/cargo-auto-release.yml@main
+    with:
+      bump-type: ${{ inputs.bump-type || 'patch' }}
+    secrets: inherit
