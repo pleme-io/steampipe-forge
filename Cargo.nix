@@ -361,11 +361,15 @@ rec {
         workspace_member = null;
         src = pkgs.fetchgit {
           url = "https://github.com/pleme-io/iac-forge";
-          rev = "e45d9891a4b054f4d68710fe1a50b4545bb54d60";
+          rev = "439749d70832059fcfc15a500daad520c89cc7e6";
           sha256 = "008rmwqdls902sh05afnxgm9a7r36c2kd7dg1j9qlm52jxbm0dni";
         };
         libName = "iac_forge";
         dependencies = [
+          {
+            name = "meimei";
+            packageId = "meimei";
+          }
           {
             name = "openapi-forge";
             packageId = "openapi-forge";
@@ -378,6 +382,10 @@ rec {
           {
             name = "serde_json";
             packageId = "serde_json";
+          }
+          {
+            name = "takumi";
+            packageId = "takumi";
           }
           {
             name = "thiserror";
@@ -534,6 +542,18 @@ rec {
           "value-bag" = [ "dep:value-bag" ];
         };
       };
+      "meimei" = rec {
+        crateName = "meimei";
+        version = "0.1.0";
+        edition = "2024";
+        workspace_member = null;
+        src = pkgs.fetchgit {
+          url = "https://github.com/pleme-io/meimei";
+          rev = "8d0eeb2ba75b02e2e68c8b6ea5d5ae2f87f3180e";
+          sha256 = "1zqlb51idmprjy411fgw4xhj4r3zqqyi20vbp78pbz80pgrdz9my";
+        };
+
+      };
       "memchr" = rec {
         crateName = "memchr";
         version = "2.8.0";
@@ -579,7 +599,7 @@ rec {
         workspace_member = null;
         src = pkgs.fetchgit {
           url = "https://github.com/pleme-io/openapi-forge";
-          rev = "e9bd7d2313580b9dd5357dd22cde9fc5111cd124";
+          rev = "2a1ae48bdac27be8cb76767a9e70e47e0e60f6e6";
           sha256 = "15h1nylbr18v33s1d58zq9r5n8a7iwx2vpybc9fbv1dw5d6qi3cn";
         };
         libName = "openapi_forge";
@@ -588,6 +608,10 @@ rec {
             name = "indexmap";
             packageId = "indexmap";
             features = [ "serde" ];
+          }
+          {
+            name = "sekkei";
+            packageId = "sekkei";
           }
           {
             name = "serde";
@@ -599,8 +623,12 @@ rec {
             packageId = "serde_json";
           }
           {
-            name = "serde_yaml";
-            packageId = "serde_yaml";
+            name = "serde_yaml_ng";
+            packageId = "serde_yaml_ng";
+          }
+          {
+            name = "takumi";
+            packageId = "takumi";
           }
           {
             name = "thiserror";
@@ -820,6 +848,38 @@ rec {
           "no-panic" = [ "dep:no-panic" ];
         };
       };
+      "sekkei" = rec {
+        crateName = "sekkei";
+        version = "0.1.0";
+        edition = "2024";
+        workspace_member = null;
+        src = pkgs.fetchgit {
+          url = "https://github.com/pleme-io/sekkei";
+          rev = "6f05014b08bd1480ecd992f929b33f74677cecf1";
+          sha256 = "08faq46xbpngdm3whmkn2342zq2abf467xbibgksi3cdjd9wi6sb";
+        };
+        dependencies = [
+          {
+            name = "serde";
+            packageId = "serde";
+            features = [ "derive" ];
+          }
+          {
+            name = "serde_json";
+            packageId = "serde_json";
+          }
+          {
+            name = "serde_yaml_ng";
+            packageId = "serde_yaml_ng";
+          }
+          {
+            name = "thiserror";
+            packageId = "thiserror";
+          }
+        ];
+        features = {
+        };
+      };
       "semver" = rec {
         crateName = "semver";
         version = "1.0.27";
@@ -1001,13 +1061,13 @@ rec {
         };
         resolvedDefaultFeatures = [ "serde" ];
       };
-      "serde_yaml" = rec {
-        crateName = "serde_yaml";
-        version = "0.9.34+deprecated";
+      "serde_yaml_ng" = rec {
+        crateName = "serde_yaml_ng";
+        version = "0.10.0";
         edition = "2021";
-        sha256 = "0isba1fjyg3l6rxk156k600ilzr8fp7crv82rhal0rxz5qd1m2va";
+        sha256 = "07ylpzx9xykdj4fqfa0vb6xz4c1pazrqqibv78hd8dlbp4kvckbv";
         authors = [
-          "David Tolnay <dtolnay@gmail.com>"
+          "Antoine Catton <devel@antoine.catton.fr>"
         ];
         dependencies = [
           {
@@ -1035,7 +1095,7 @@ rec {
       };
       "steampipe-forge" = rec {
         crateName = "steampipe-forge";
-        version = "0.1.0";
+        version = "0.1.1";
         edition = "2024";
         src = lib.cleanSourceWith { filter = sourceFilter;  src = ./.; };
         libName = "steampipe_forge";
@@ -1094,6 +1154,38 @@ rec {
           "test" = [ "syn-test-suite/all-features" ];
         };
         resolvedDefaultFeatures = [ "clone-impls" "default" "derive" "full" "parsing" "printing" "proc-macro" ];
+      };
+      "takumi" = rec {
+        crateName = "takumi";
+        version = "0.1.0";
+        edition = "2024";
+        workspace_member = null;
+        src = pkgs.fetchgit {
+          url = "https://github.com/pleme-io/takumi";
+          rev = "ad741fec436581da262a77a5a5cf58ca2137ee3b";
+          sha256 = "10w46fjaddbrch5i1s0swj3an95m0mdp0klf10r9qq86rq4vdslw";
+        };
+        dependencies = [
+          {
+            name = "indexmap";
+            packageId = "indexmap";
+            features = [ "serde" ];
+          }
+          {
+            name = "sekkei";
+            packageId = "sekkei";
+          }
+          {
+            name = "serde";
+            packageId = "serde";
+            features = [ "derive" ];
+          }
+          {
+            name = "serde_json";
+            packageId = "serde_json";
+          }
+        ];
+
       };
       "tempfile" = rec {
         crateName = "tempfile";
