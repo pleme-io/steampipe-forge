@@ -142,7 +142,7 @@ checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 [[package]]
 name = "iac-forge"
 version = "0.1.0"
-source = "git+https://github.com/pleme-io/iac-forge#e5920ee984339e1aad319b0929a0afc8f2be26e1"
+source = "git+https://github.com/pleme-io/iac-forge#c592b447755b62f9c3c7c5181cdd7b4508cae3df"
 dependencies = [
  "blake3",
  "meimei",
@@ -204,8 +204,8 @@ checksum = "616ec5685824bcc94416c6d4a7a446eea774a31efd7062c8480ba6fd06d7a6e5"
 
 [[package]]
 name = "meimei"
-version = "0.1.0"
-source = "git+https://github.com/pleme-io/meimei#ba236e7134887a1a3233c4bf96e8e659341eb658"
+version = "0.1.1"
+source = "git+https://github.com/pleme-io/meimei#a3865aca03012893719fa4d093e20de4065fa58b"
 
 [[package]]
 name = "memchr"
@@ -222,7 +222,7 @@ checksum = "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50"
 [[package]]
 name = "openapi-forge"
 version = "0.1.1"
-source = "git+https://github.com/pleme-io/openapi-forge#585b21fc0812fb65103b1903fa75cc0d67ec1cae"
+source = "git+https://github.com/pleme-io/openapi-forge#acb030774cfbad58192a5e5e5ed2b90133200136"
 dependencies = [
  "indexmap",
  "sekkei",
@@ -288,8 +288,8 @@ checksum = "9774ba4a74de5f7b1c1451ed6cd5285a32eddb5cccb8cc655a4e50009e06477f"
 
 [[package]]
 name = "sekkei"
-version = "0.1.0"
-source = "git+https://github.com/pleme-io/sekkei#52f2ab0650e26fd931ea15fc48bb246dda1d200e"
+version = "0.1.1"
+source = "git+https://github.com/pleme-io/sekkei#f9d27e9971bd0be7729a492797efa65711cb6171"
 dependencies = [
  "serde",
  "serde_json",
@@ -398,7 +398,7 @@ dependencies = [
 [[package]]
 name = "takumi"
 version = "0.1.0"
-source = "git+https://github.com/pleme-io/takumi#9a9c47331f99f0c2abc6ca820f4e53d37f96fd44"
+source = "git+https://github.com/pleme-io/takumi#234adbbe0e3f75239cba39b7fe033d9d6806b162"
 dependencies = [
  "indexmap",
  "sekkei",
