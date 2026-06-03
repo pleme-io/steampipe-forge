@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "cargo_lock_sha256": "86031c157d0b579e8411deb5a9ab26fb244481cb028cdb11854af368fdaa9288",
+  "cargo_lock_sha256": "83fa113cd390175f749f6bafcc7d4cce84a4b52295f58a918d7d2e344526b91d",
   "target_resolves": {
     "base": {
       "arrayref-0.3.9": {
@@ -13,14 +13,14 @@
         "build_dependencies": [],
         "features": []
       },
-      "bitflags-2.11.1": {
+      "bitflags-2.12.1": {
         "runtime_dependencies": [],
         "build_dependencies": [],
         "features": [
           "std"
         ]
       },
-      "cc-1.2.62": {
+      "cc-1.2.63": {
         "runtime_dependencies": [
           {
             "name": "find_msvc_tools",
@@ -34,7 +34,7 @@
           },
           {
             "name": "shlex",
-            "package_key": "shlex-1.3.0",
+            "package_key": "shlex-2.0.1",
             "kind": "normal",
             "features": [],
             "uses_default_features": true,
@@ -240,7 +240,7 @@
           },
           {
             "name": "openapi_forge",
-            "package_key": "openapi-forge-0.1.1",
+            "package_key": "openapi-forge-0.1.2",
             "kind": "normal",
             "features": [],
             "uses_default_features": true,
@@ -363,7 +363,7 @@
         "build_dependencies": [],
         "features": []
       },
-      "memchr-2.8.0": {
+      "memchr-2.8.1": {
         "runtime_dependencies": [],
         "build_dependencies": [],
         "features": [
@@ -380,7 +380,7 @@
           "std"
         ]
       },
-      "openapi-forge-0.1.1": {
+      "openapi-forge-0.1.2": {
         "runtime_dependencies": [
           {
             "name": "indexmap",
@@ -654,7 +654,7 @@
           },
           {
             "name": "memchr",
-            "package_key": "memchr-2.8.0",
+            "package_key": "memchr-2.8.1",
             "kind": "normal",
             "features": [],
             "uses_default_features": false,
@@ -763,7 +763,7 @@
         "build_dependencies": [],
         "features": []
       },
-      "shlex-1.3.0": {
+      "shlex-2.0.1": {
         "runtime_dependencies": [],
         "build_dependencies": [],
         "features": [
@@ -771,7 +771,7 @@
           "std"
         ]
       },
-      "steampipe-forge-0.1.1": {
+      "steampipe-forge-0.1.2": {
         "runtime_dependencies": [
           {
             "name": "iac_forge",
@@ -1182,7 +1182,7 @@
         "runtime_dependencies": [
           {
             "name": "memchr",
-            "package_key": "memchr-2.8.0",
+            "package_key": "memchr-2.8.1",
             "kind": "normal",
             "features": [],
             "uses_default_features": false,
@@ -1253,7 +1253,7 @@
             "build_dependencies": [
               {
                 "name": "cc",
-                "package_key": "cc-1.2.62",
+                "package_key": "cc-1.2.63",
                 "kind": "build",
                 "features": [],
                 "uses_default_features": true,
@@ -1271,7 +1271,7 @@
             "runtime_dependencies": [
               {
                 "name": "bitflags",
-                "package_key": "bitflags-2.11.1",
+                "package_key": "bitflags-2.12.1",
                 "kind": "normal",
                 "features": [],
                 "uses_default_features": false,
@@ -1398,7 +1398,7 @@
             "build_dependencies": [
               {
                 "name": "cc",
-                "package_key": "cc-1.2.62",
+                "package_key": "cc-1.2.63",
                 "kind": "build",
                 "features": [],
                 "uses_default_features": true,
@@ -1421,7 +1421,7 @@
             "runtime_dependencies": [
               {
                 "name": "bitflags",
-                "package_key": "bitflags-2.11.1",
+                "package_key": "bitflags-2.12.1",
                 "kind": "normal",
                 "features": [],
                 "uses_default_features": false,
@@ -1548,7 +1548,7 @@
             "build_dependencies": [
               {
                 "name": "cc",
-                "package_key": "cc-1.2.62",
+                "package_key": "cc-1.2.63",
                 "kind": "build",
                 "features": [],
                 "uses_default_features": true,
@@ -1583,7 +1583,7 @@
             "runtime_dependencies": [
               {
                 "name": "bitflags",
-                "package_key": "bitflags-2.11.1",
+                "package_key": "bitflags-2.12.1",
                 "kind": "normal",
                 "features": [],
                 "uses_default_features": false,
@@ -1730,7 +1730,7 @@
             "build_dependencies": [
               {
                 "name": "cc",
-                "package_key": "cc-1.2.62",
+                "package_key": "cc-1.2.63",
                 "kind": "build",
                 "features": [],
                 "uses_default_features": true,
@@ -1765,7 +1765,7 @@
             "runtime_dependencies": [
               {
                 "name": "bitflags",
-                "package_key": "bitflags-2.11.1",
+                "package_key": "bitflags-2.12.1",
                 "kind": "normal",
                 "features": [],
                 "uses_default_features": false,
@@ -1902,7 +1902,7 @@
             "build_dependencies": [
               {
                 "name": "cc",
-                "package_key": "cc-1.2.62",
+                "package_key": "cc-1.2.63",
                 "kind": "build",
                 "features": [],
                 "uses_default_features": true,
@@ -1932,7 +1932,7 @@
             "runtime_dependencies": [
               {
                 "name": "bitflags",
-                "package_key": "bitflags-2.11.1",
+                "package_key": "bitflags-2.12.1",
                 "kind": "normal",
                 "features": [],
                 "uses_default_features": false,
@@ -2069,7 +2069,7 @@
             "build_dependencies": [
               {
                 "name": "cc",
-                "package_key": "cc-1.2.62",
+                "package_key": "cc-1.2.63",
                 "kind": "build",
                 "features": [],
                 "uses_default_features": true,
@@ -2099,7 +2099,7 @@
             "runtime_dependencies": [
               {
                 "name": "bitflags",
-                "package_key": "bitflags-2.11.1",
+                "package_key": "bitflags-2.12.1",
                 "kind": "normal",
                 "features": [],
                 "uses_default_features": false,
@@ -2197,14 +2197,14 @@
     "arrayvec-0.7.6": {
       "edition": "2018"
     },
-    "bitflags-2.11.1": {
+    "bitflags-2.12.1": {
       "edition": "2021"
     },
     "blake3-1.8.5": {
       "edition": "2024",
       "build_script": "build.rs"
     },
-    "cc-1.2.62": {
+    "cc-1.2.63": {
       "edition": "2018"
     },
     "cfg-if-1.0.4": {
@@ -2248,13 +2248,13 @@
     "meimei-0.1.1": {
       "edition": "2024"
     },
-    "memchr-2.8.0": {
+    "memchr-2.8.1": {
       "edition": "2021"
     },
     "once_cell-1.21.4": {
       "edition": "2021"
     },
-    "openapi-forge-0.1.1": {
+    "openapi-forge-0.1.2": {
       "edition": "2024"
     },
     "proc-macro2-1.0.106": {
@@ -2297,10 +2297,10 @@
     "serde_yaml_ng-0.10.0": {
       "edition": "2021"
     },
-    "shlex-1.3.0": {
-      "edition": "2015"
+    "shlex-2.0.1": {
+      "edition": "2018"
     },
-    "steampipe-forge-0.1.1": {
+    "steampipe-forge-0.1.2": {
       "edition": "2024",
       "lib_target": {
         "name": "steampipe_forge",
@@ -2368,10 +2368,10 @@
   },
   "git_nar_sha256": {
     "iac-forge-0.1.0": "sha256-JJLxk1jpaQtPyfHJLA1McpTd0llFQ9aKk9LbBxePyeI=",
-    "meimei-0.1.1": "sha256-GRqKw63sl3lo36lgwtYiMCk7A/egtmKts9UVGvK6WlI=",
-    "openapi-forge-0.1.1": "sha256-tlrEeC1CPCEw9Pc+itBwIVHsKsMz0APueRkwJl3Copk=",
-    "sekkei-0.1.1": "sha256-qOa3MHGqWVhvbjmjHg0RJo0pfNSOXqEArNAQ0xfQNXw=",
-    "takumi-0.1.0": "sha256-neqseMVFLwd6TWIZAF4ylEkbAYzWUTzYYeDBDzYShNg="
+    "meimei-0.1.1": "sha256-6ofJ5MQSCTpFUI2OLNBrXXUWDFDfwDuwfqF7A0b2dKA=",
+    "openapi-forge-0.1.2": "sha256-P/brnxxLGELUJPiqWwnnfNItuA0c9l2s9aFAJ/Dd7ZY=",
+    "sekkei-0.1.1": "sha256-QKIS+nHcesEYSNUbwdnMXG+6sYQxxV2iWQJFNxEFXKg=",
+    "takumi-0.1.0": "sha256-qLzyOiHRxMLF/CziIjJytkkMZ1h3vDf7qvhlPxpCEIk="
   },
   "flake_metadata": {}
 }
