@@ -67,11 +67,11 @@ impl Backend for SteampipeBackend {
         resource: &IacResource,
         provider: &IacProvider,
     ) -> Result<Vec<GeneratedArtifact>, IacForgeError> {
-        Ok(vec![GeneratedArtifact {
-            path: table_path(provider, &resource.name, &ArtifactKind::Resource),
-            content: table_gen::generate_table_file(resource, provider),
-            kind: ArtifactKind::Resource,
-        }])
+        Ok(vec![GeneratedArtifact::new(
+            table_path(provider, &resource.name, &ArtifactKind::Resource),
+            table_gen::generate_table_file(resource, provider),
+            ArtifactKind::Resource,
+        )])
     }
 
     fn generate_data_source(
@@ -79,11 +79,11 @@ impl Backend for SteampipeBackend {
         ds: &IacDataSource,
         provider: &IacProvider,
     ) -> Result<Vec<GeneratedArtifact>, IacForgeError> {
-        Ok(vec![GeneratedArtifact {
-            path: table_path(provider, &ds.name, &ArtifactKind::DataSource),
-            content: table_gen::generate_data_source_table_file(ds, provider),
-            kind: ArtifactKind::DataSource,
-        }])
+        Ok(vec![GeneratedArtifact::new(
+            table_path(provider, &ds.name, &ArtifactKind::DataSource),
+            table_gen::generate_data_source_table_file(ds, provider),
+            ArtifactKind::DataSource,
+        )])
     }
 
     fn generate_provider(
@@ -92,11 +92,11 @@ impl Backend for SteampipeBackend {
         resources: &[IacResource],
         data_sources: &[IacDataSource],
     ) -> Result<Vec<GeneratedArtifact>, IacForgeError> {
-        Ok(vec![GeneratedArtifact {
-            path: "plugin.go".to_string(),
-            content: table_gen::generate_plugin_file(provider, resources, data_sources),
-            kind: ArtifactKind::Provider,
-        }])
+        Ok(vec![GeneratedArtifact::new(
+            "plugin.go",
+            table_gen::generate_plugin_file(provider, resources, data_sources),
+            ArtifactKind::Provider,
+        )])
     }
 
     fn generate_test(
@@ -104,11 +104,11 @@ impl Backend for SteampipeBackend {
         resource: &IacResource,
         provider: &IacProvider,
     ) -> Result<Vec<GeneratedArtifact>, IacForgeError> {
-        Ok(vec![GeneratedArtifact {
-            path: table_path(provider, &resource.name, &ArtifactKind::Test),
-            content: table_gen::generate_test_file(resource, provider),
-            kind: ArtifactKind::Test,
-        }])
+        Ok(vec![GeneratedArtifact::new(
+            table_path(provider, &resource.name, &ArtifactKind::Test),
+            table_gen::generate_test_file(resource, provider),
+            ArtifactKind::Test,
+        )])
     }
 
     fn naming(&self) -> &dyn NamingConvention {
