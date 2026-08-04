@@ -7,7 +7,7 @@ description = "Steampipe plugin table generator from IaC forge IR"
 homepage = "https://github.com/pleme-io/steampipe-forge"
 repository = "https://github.com/pleme-io/steampipe-forge"
 license = "MIT"
-categories = ["development-tools", "code-generators"]
+categories = ["development-tools"]
 keywords = ["steampipe", "plugin", "codegen", "openapi"]
 
 [lints.clippy]
