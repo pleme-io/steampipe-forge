@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
-  "cargo_lock_sha256": "a63df7da6c36a8bba2e3e5c76231309056d6ae85126996d48abafab92309ae45",
+  "cargo_lock_sha256": "495257db4aae24445554801d1d34548e1e10295e013018ba8f5a545f827ee6b5",
   "manifest_sha256": {
-    "Cargo.toml": "722a06b9cbf6d9b1c8c1d5bfb1589d8dcdb464eae4418e102e0be7de1bc48d0f"
+    "Cargo.toml": "08bcdc381c9e995039557cceeebf8e85860691e081e1aefe7c90d5d89d28b401"
   },
   "target_resolves": {
     "base": {
@@ -824,7 +824,7 @@
           "std"
         ]
       },
-      "steampipe-forge-0.1.6": {
+      "steampipe-forge-0.1.7": {
         "runtime_dependencies": [
           {
             "name": "iac_forge",
@@ -2344,7 +2344,7 @@
     "shlex-2.0.1": {
       "edition": "2018"
     },
-    "steampipe-forge-0.1.6": {
+    "steampipe-forge-0.1.7": {
       "edition": "2024",
       "lib_target": {
         "name": "steampipe_forge",
